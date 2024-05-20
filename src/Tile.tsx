@@ -6,25 +6,29 @@ import type { Player } from './types'
 
 interface TileProps extends GroupProps {
   size: number
-  state: 'default' | 'success' | 'error'
+  state: 'idle' | 'success' | 'error'
   value: keyof typeof Player | null
   isAvailable?: boolean
 }
 
 const colors: Record<TileProps['state'], string> = {
+  idle: '#def0ff',
   success: '#3bff98',
   error: '#ff3b3b',
-  default: '#def0ff',
 }
 
-export const Tile = ({ size = 1, state = 'default', value = null, isAvailable = true, ...props }: TileProps) => {
+export const Tile = ({ size = 1, state = 'idle', value = null, isAvailable = true, onClick, ...props }: TileProps) => {
   const ref = React.useRef(null)
   const [hovered, setHovered] = React.useState(false)
 
-  useCursor(hovered)
+  useCursor(hovered && isAvailable)
+
+  const pointerEvents = isAvailable
+    ? { onClick, onPointerEnter: () => setHovered(true), onPointerLeave: () => setHovered(false) }
+    : {}
 
   return (
-    <group ref={ref} {...props} onPointerEnter={() => setHovered(true)} onPointerLeave={() => setHovered(false)}>
+    <group ref={ref} {...props} {...pointerEvents}>
       <RoundedBox
         args={[size, size, size] as any} // Width, height, depth. Default is [1, 1, 1]
         radius={0.2} // Radius of the rounded corners. Default. Default is 4
@@ -34,8 +38,10 @@ export const Tile = ({ size = 1, state = 'default', value = null, isAvailable = 
       >
         <meshStandardMaterial attach="material" toneMapped={false} color={colors[state]} />
         {isNotNull(value) && (
-          <Html center>
-            <div style={{ color: 'black' }}>{value}</div>
+          <Html center transform position-z={size * 0.51} zIndexRange={[1, 99]}>
+            <div className="player-mark" data-state={state}>
+              <div>{value}</div>
+            </div>
           </Html>
         )}
       </RoundedBox>
