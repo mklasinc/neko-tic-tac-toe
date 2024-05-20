@@ -1,35 +1,36 @@
+import { useStore } from './store'
 import React, { useEffect, useRef } from 'react'
 
-interface LoaderPops {
-  show: boolean
-  setShow: (show: boolean) => void
-}
+// interface LoaderPops {
+//   show: boolean
+//   setShow: (show: boolean) => void
+// }
 
-const LoaderContext = React.createContext<LoaderPops>({
-  show: false,
-  setShow: () => {
-    /* noop */
-  },
-})
+// const LoaderContext = React.createContext<LoaderPops>({
+//   show: false,
+//   setShow: () => {
+//     /* noop */
+//   },
+// })
 
-export const Provider = (props: React.PropsWithChildren<{}>) => {
-  const [show, setShow] = React.useState(false)
+// export const Provider = (props: React.PropsWithChildren<{}>) => {
+//   const [show, setShow] = React.useState(false)
 
-  return <LoaderContext.Provider value={{ show, setShow }}>{props.children}</LoaderContext.Provider>
-}
+//   return <LoaderContext.Provider value={{ show, setShow }}>{props.children}</LoaderContext.Provider>
+// }
 
 export const Loader = () => {
   const [playAnimation, setPlayAnimation] = React.useState(true)
   const [loaderText, setLoaderText] = React.useState('X')
-  const { show } = React.useContext(LoaderContext)
+  const isLoading = useStore((state) => state.isLoading)
 
   const intervalId = useRef<number | null>(null)
 
   useEffect(() => {
-    if (!show) {
+    if (!isLoading) {
       setTimeout(() => setPlayAnimation(false), 1000)
     }
-  }, [show])
+  }, [isLoading])
 
   useEffect(() => {
     if (!playAnimation) return
@@ -41,7 +42,7 @@ export const Loader = () => {
     return () => {
       if (intervalId.current) clearInterval(intervalId.current)
     }
-  }, [playAnimation, show])
+  }, [playAnimation])
 
   return (
     <div className="loader" data-show={playAnimation}>
@@ -51,15 +52,14 @@ export const Loader = () => {
 }
 
 const Trigger = () => {
-  const { setShow } = React.useContext(LoaderContext)
+  const setIsLoading = useStore((state) => state.setIsLoading)
 
   useEffect(() => {
     return () => {
-      setShow(false)
+      setIsLoading(false)
     }
   }, [])
   return null
 }
 
-Loader.Provider = Provider
 Loader.Trigger = Trigger

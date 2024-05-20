@@ -1,11 +1,14 @@
 import { Tile } from './Tile'
-import { Player } from './types'
 import { areValuesEqual } from './utils/eq'
 import { isNotNull } from './utils/type-guards'
 import { Loader } from './Loader'
+import WavyText from './WavyText'
+import { Player } from './types'
+import { useStore } from './store'
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls, PerspectiveCamera } from '@react-three/drei'
 import React, { Suspense } from 'react'
+import type { Tiles, GameOutcome } from './types'
 
 const TILE_SIZE = 1
 const GAP = 0.2
@@ -15,10 +18,6 @@ const getTilePosition = (index: number) => {
   const y = Math.floor(index / 3) * (TILE_SIZE + GAP) * -1
   return [x, y, 0] as const
 }
-
-type Tiles = (keyof typeof Player | null)[]
-
-type GameOutcome = keyof typeof Player | 'draw' | null
 
 const getDefaultTiles = (): Tiles => Array.from({ length: 9 }).fill(null) as Tiles
 // const getDefaultTiles = (): Tiles => [Player.X, Player.X, Player.X, Player.O, null, null, null, null, Player.O]
@@ -44,8 +43,14 @@ export default function App() {
   //   color: '#ff0000',
   // })
 
-  const [tiles, setTiles] = React.useState<Tiles>(getDefaultTiles())
-  const [player, setPlayer] = React.useState<Player>(Player.X)
+  const isLoading = useStore((state) => state.isLoading)
+
+  const tiles = useStore((state) => state.tiles)
+  const setTiles = useStore((state) => state.setTiles)
+
+  const player = useStore((state) => state.player)
+  const setPlayer = useStore((state) => state.setPlayer)
+  const togglePlayer = useStore((state) => state.togglePlayer)
 
   const gameOutcome = React.useMemo<GameOutcome>(() => {
     // check rows
@@ -69,7 +74,7 @@ export default function App() {
   const hasPlayerWonTheGame = gameOutcome === Player.X || gameOutcome === Player.O
 
   return (
-    <Loader.Provider>
+    <>
       <Loader />
       <Canvas>
         <Suspense fallback={<Loader.Trigger />}>
@@ -96,14 +101,14 @@ export default function App() {
 
                   if (!canPlaceTile) return
 
-                  setTiles((tiles) => {
-                    return tiles.map((tile, tileIndex) => {
+                  setTiles(
+                    tiles.map((tile, tileIndex) => {
                       if (index === tileIndex) return player
                       return tile
                     })
-                  })
+                  )
 
-                  setPlayer((player) => (player === Player.X ? Player.O : Player.X))
+                  togglePlayer()
                 }}
               />
             ))}
@@ -112,7 +117,7 @@ export default function App() {
       </Canvas>
 
       <div className="ui">
-        <h1>Tic tac toe</h1>
+        <WavyText text="Tic tac toe" replay={!isLoading} delay={0.9} />
         {!isGameOver && <div className="status">Player {player}'s turn</div>}
         {isGameOver && (
           <>
@@ -135,6 +140,6 @@ export default function App() {
           </>
         )}
       </div>
-    </Loader.Provider>
+    </>
   )
 }

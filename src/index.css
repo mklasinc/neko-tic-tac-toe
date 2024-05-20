@@ -45,6 +45,7 @@
   font-display: swap;
 }
 
+*,
 *:before,
 *:after {
   margin: 0;
@@ -169,9 +170,7 @@ button:not(:disabled) {
   }
 
   to {
-    text-shadow:
-      0 0 5px #ccedd2,
-      0 0 10px #ccedd2;
+    text-shadow: 0 0 5px #ccedd2, 0 0 10px #ccedd2;
   }
 }
 
