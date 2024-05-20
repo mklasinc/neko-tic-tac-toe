@@ -1,15 +1,16 @@
 import { Tile } from './Tile'
 import { areValuesEqual } from './utils/eq'
-import { isNotNull } from './utils/type-guards'
+import { isArray, isNotEmpty, isNotNull } from './utils/type-guards'
 import { Loader } from './Loader'
 import WavyText from './WavyText'
 import { Player } from './types'
 import { useStore } from './store'
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls, PerspectiveCamera } from '@react-three/drei'
-import React, { Suspense } from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
-import type { Tiles, GameOutcome } from './types'
+import React, { Suspense, useEffect, useRef } from 'react'
+import { AnimatePresence, animate, motion, motionValue, useMotionValue } from 'framer-motion'
+import { Group } from 'three'
+import type { Tiles } from './types'
 
 const TILE_SIZE = 1
 const GAP = 0.2
@@ -21,29 +22,8 @@ const getTilePosition = (index: number) => {
 }
 
 const getDefaultTiles = (): Tiles => Array.from({ length: 9 }).fill(null) as Tiles
-// const getDefaultTiles = (): Tiles => [Player.X, Player.X, Player.X, Player.O, null, null, null, null, Player.O]
-
-const isTilePartOfWinningLine = (tiles: Tiles, index: number) => {
-  // check rows
-  if (isNotNull(tiles[0]) && areValuesEqual(tiles[0], tiles[1], tiles[2])) return [0, 1, 2].includes(index)
-  if (isNotNull(tiles[3]) && areValuesEqual(tiles[3], tiles[4], tiles[5])) return [3, 4, 5].includes(index)
-  if (isNotNull(tiles[6]) && areValuesEqual(tiles[6], tiles[7], tiles[8])) return [6, 7, 8].includes(index)
-
-  // check columns
-  if (isNotNull(tiles[0]) && areValuesEqual(tiles[0], tiles[3], tiles[6])) return [0, 3, 6].includes(index)
-  if (isNotNull(tiles[1]) && areValuesEqual(tiles[1], tiles[4], tiles[7])) return [1, 4, 7].includes(index)
-  if (isNotNull(tiles[2]) && areValuesEqual(tiles[2], tiles[5], tiles[8])) return [2, 5, 8].includes(index)
-
-  // check diagonals
-  if (isNotNull(tiles[0]) && areValuesEqual(tiles[0], tiles[4], tiles[8])) return [0, 4, 8].includes(index)
-  if (isNotNull(tiles[2]) && areValuesEqual(tiles[2], tiles[4], tiles[6])) return [2, 4, 6].includes(index)
-}
 
 export default function App() {
-  // const { color } = useControls({
-  //   color: '#ff0000',
-  // })
-
   const isLoading = useStore((state) => state.isLoading)
 
   const tiles = useStore((state) => state.tiles)
@@ -53,30 +33,71 @@ export default function App() {
   const setPlayer = useStore((state) => state.setPlayer)
   const togglePlayer = useStore((state) => state.togglePlayer)
 
-  const gameOutcome = React.useMemo<GameOutcome>(() => {
+  const gameOutcome = React.useMemo(() => {
     // check rows
-    if (isNotNull(tiles[0]) && areValuesEqual(tiles[0], tiles[1], tiles[2])) return tiles[0]
-    if (isNotNull(tiles[3]) && areValuesEqual(tiles[3], tiles[4], tiles[5])) return tiles[3]
-    if (isNotNull(tiles[6]) && areValuesEqual(tiles[6], tiles[7], tiles[8])) return tiles[6]
+    if (isNotNull(tiles[0]) && areValuesEqual(tiles[0], tiles[1], tiles[2])) return [0, 1, 2]
+    if (isNotNull(tiles[3]) && areValuesEqual(tiles[3], tiles[4], tiles[5])) return [3, 4, 5]
+    if (isNotNull(tiles[6]) && areValuesEqual(tiles[6], tiles[7], tiles[8])) return [6, 7, 8]
 
     // check columns
-    if (isNotNull(tiles[0]) && areValuesEqual(tiles[0], tiles[3], tiles[6])) return tiles[0]
-    if (isNotNull(tiles[1]) && areValuesEqual(tiles[1], tiles[4], tiles[7])) return tiles[1]
-    if (isNotNull(tiles[2]) && areValuesEqual(tiles[2], tiles[5], tiles[8])) return tiles[2]
+    if (isNotNull(tiles[0]) && areValuesEqual(tiles[0], tiles[3], tiles[6])) return [0, 3, 6]
+    if (isNotNull(tiles[1]) && areValuesEqual(tiles[1], tiles[4], tiles[7])) return [1, 4, 7]
+    if (isNotNull(tiles[2]) && areValuesEqual(tiles[2], tiles[5], tiles[8])) return [2, 5, 8]
 
     // check diagonals
-    if (isNotNull(tiles[0]) && areValuesEqual(tiles[0], tiles[4], tiles[8])) return tiles[0]
-    if (isNotNull(tiles[2]) && areValuesEqual(tiles[2], tiles[4], tiles[6])) return tiles[2]
+    if (isNotNull(tiles[0]) && areValuesEqual(tiles[0], tiles[4], tiles[8])) return [0, 4, 8]
+    if (isNotNull(tiles[2]) && areValuesEqual(tiles[2], tiles[4], tiles[6])) return [2, 4, 6]
 
-    return tiles.every(isNotNull) ? 'draw' : null
+    return tiles.every(isNotNull) ? [] : null
   }, [tiles])
 
+  const isTilePartOfWinningLine = (index: number) => isNotNull(gameOutcome) && gameOutcome.includes(index)
+
   const isGameOver = isNotNull(gameOutcome)
-  const hasPlayerWonTheGame = gameOutcome === Player.X || gameOutcome === Player.O
+  const winner = isGameOver ? tiles[gameOutcome[0]] : null
+
+  const gridContainerRef = useRef<Group>(null)
+  const tileRefs = useRef<Group[]>([])
+
+  useEffect(() => {
+    if (!isGameOver || !isArray(gameOutcome)) return
+
+    gameOutcome.map((_, index) => {
+      const delay = index * 0.1
+
+      const z = motionValue(0)
+
+      return animate(z, [0, 0.5, 0], {
+        duration: 0.4,
+        delay,
+        ease: 'easeInOut',
+        onUpdate: (value) => {
+          if (!tileRefs.current[gameOutcome[index]]) return
+          ;(tileRefs.current[gameOutcome[index]] as Group).position.z = value
+        },
+      })
+    })
+  }, [isGameOver, gameOutcome])
+
+  const groupRotation = useMotionValue(0)
+  useEffect(() => {
+    animate(groupRotation, isNotNull(gameOutcome) ? Math.PI * 0.1 : 0, {
+      duration: 0.4,
+      type: 'spring',
+      damping: 10,
+      stiffness: 100,
+      delay: 0.1,
+      onUpdate: (value) => {
+        if (!gridContainerRef.current) return
+        gridContainerRef.current.rotation.y = -value
+        gridContainerRef.current.rotation.x = value * 0.5
+      },
+    })
+  }, [gameOutcome])
 
   return (
     <>
-      <Loader />
+      {/* <Loader /> */}
       <Canvas>
         <Suspense fallback={<Loader.Trigger />}>
           <OrbitControls />
@@ -87,31 +108,38 @@ export default function App() {
           <directionalLight position={[0, 0, -5]} intensity={0.5} />
           <ambientLight intensity={0.5} />
 
-          <group position-x={-(TILE_SIZE + GAP)} position-y={TILE_SIZE + GAP}>
+          <group ref={gridContainerRef} position-x={-(TILE_SIZE + GAP)} position-y={TILE_SIZE + GAP}>
             {tiles.map((_, index) => (
-              <Tile
-                key={index}
-                position={getTilePosition(index)}
-                size={TILE_SIZE}
-                state={hasPlayerWonTheGame && isTilePartOfWinningLine(tiles, index) ? 'success' : 'idle'}
-                currentPlayer={player}
-                value={tiles[index]}
-                isAvailable={!isGameOver && tiles[index] === null}
-                onClick={() => {
-                  const canPlaceTile = tiles[index] === null
+              <group key={index} position={getTilePosition(index)}>
+                <group
+                  ref={(ref) => {
+                    // @ts-ignore
+                    tileRefs.current[index] = ref
+                  }}
+                >
+                  <Tile
+                    size={TILE_SIZE}
+                    state={isNotNull(winner) && isTilePartOfWinningLine(index) ? 'success' : 'idle'}
+                    currentPlayer={player}
+                    value={tiles[index]}
+                    isAvailable={!isGameOver && tiles[index] === null}
+                    onClick={() => {
+                      const canPlaceTile = tiles[index] === null
 
-                  if (!canPlaceTile) return
+                      if (!canPlaceTile) return
 
-                  setTiles(
-                    tiles.map((tile, tileIndex) => {
-                      if (index === tileIndex) return player
-                      return tile
-                    })
-                  )
+                      setTiles(
+                        tiles.map((tile, tileIndex) => {
+                          if (index === tileIndex) return player
+                          return tile
+                        })
+                      )
 
-                  togglePlayer()
-                }}
-              />
+                      togglePlayer()
+                    }}
+                  />
+                </group>
+              </group>
             ))}
           </group>
         </Suspense>
@@ -128,9 +156,9 @@ export default function App() {
             exit={{ y: '-30%', opacity: 0, transition: { duration: 0.15, ease: 'easeOut' } }}
           >
             {!isGameOver && `Player ${player}'s turn`}
-            {isGameOver && gameOutcome === Player.X && 'Player X won!'}
-            {isGameOver && gameOutcome === Player.O && 'Player O won!'}
-            {isGameOver && gameOutcome === 'draw' && 'This was a draw!'}
+            {isGameOver && winner === Player.X && 'Player X won!'}
+            {isGameOver && winner === Player.O && 'Player O won!'}
+            {isGameOver && winner === null && 'This was a draw!'}
           </motion.div>
         </AnimatePresence>
 

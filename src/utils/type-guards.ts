@@ -1,23 +1,24 @@
 export const isNull = (value: any): value is null => value === null
-export const isNotNull = (value: any): value is null => !isNull(value)
+export const isNotNull = <T>(value: T | null): value is T => !isNull(value)
 
 export const isUndefined = (value: any): value is undefined => typeof value === 'undefined'
-export const isNotUndefined = (value: any): value is undefined => !isUndefined(value)
+export const isNotUndefined = <T>(value: T | undefined): value is T => !isUndefined(value)
 
 export const isNullOrUndefined = (value: any): value is null | undefined => isNull(value) || isUndefined(value)
-export const isNotNullOrUndefined = (value: any): value is null | undefined => isNotNull(value) && isNotUndefined(value)
+export const isNotNullOrUndefined = <T>(value: T | null | undefined): value is T =>
+  isNotNull(value) && isNotUndefined(value)
 
 export const isBoolean = (value: any): value is boolean => typeof value === 'boolean'
-export const isNotBoolean = (value: any): value is boolean => !isBoolean(value)
+export const isNotBoolean = <T>(value: T | boolean): value is T => !isBoolean(value)
 
 export const isFunction = (value: any): value is Function => typeof value === 'function'
 export const isNotFunction = (value: any) => !isFunction(value)
 
 export const isNumber = (value: any): value is number => typeof value === 'number'
-export const isNotNumber = (value: any): value is number => !isNumber(value)
+export const isNotNumber = <T>(value: T | number): value is T => !isNumber(value)
 
 export const isString = (value: any): value is string => typeof value === 'string'
-export const isNotString = (value: any): value is string => !isString(value)
+export const isNotString = <T>(value: T): value is T => !isString(value)
 
 export const isObject = (value: any): value is object =>
   typeof value === 'object' && value !== null && !Array.isArray(value)
