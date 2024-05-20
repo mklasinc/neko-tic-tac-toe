@@ -21,6 +21,8 @@
   --ease-in-out-expo: cubic-bezier(1, 0, 0, 1);
   --ease-in-out-circ: cubic-bezier(0.785, 0.135, 0.15, 0.86);
   --ease-in-out-back: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+  --ui-padding: 5rem;
 }
 
 @font-face {
@@ -37,7 +39,12 @@
   font-weight: 400;
 }
 
-*,
+@font-face {
+  font-family: 'Sniglet';
+  src: url('./fonts/Sniglet-webfont.woff') format('woff');
+  font-display: swap;
+}
+
 *:before,
 *:after {
   margin: 0;
@@ -51,6 +58,7 @@ body,
 canvas {
   height: 100%;
   width: 100%;
+  overflow: hidden;
 }
 
 body {
@@ -59,6 +67,7 @@ body {
 }
 
 .loader {
+  font-family: 'Sniglet';
   position: fixed;
   width: 100%;
   height: 100%;
@@ -69,7 +78,7 @@ body {
   align-items: center;
   background-color: #f5f5f5;
   z-index: 100;
-  font-size: 1.5rem;
+  font-size: 5rem;
 }
 
 .loader[data-show='false'] {
@@ -91,6 +100,33 @@ body {
   text-align: center;
   pointer-events: none;
   user-select: none;
+  padding-top: var(--ui-padding);
+  padding-bottom: var(--ui-padding);
+}
+
+.ui h1 {
+  font-family: 'Sniglet';
+  font-weight: 900;
+  font-size: 5rem;
+  margin: 1rem;
+  letter-spacing: -0.025em;
+  text-transform: uppercase;
+}
+
+.ui > * + * {
+  margin-top: 1rem;
+}
+
+.ui .status {
+  font-size: 1.5rem;
+  color: rgb(47, 47, 47);
+}
+
+.ui .btn-container {
+  position: fixed;
+  bottom: var(--ui-padding);
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 button:not(:disabled) {
@@ -99,27 +135,50 @@ button:not(:disabled) {
 }
 
 .player-mark {
-  font-family: 'ApfelGrotezk-Bold';
+  font-family: 'Sniglet';
   font-weight: 900;
-  font-size: 1.2rem;
+  font-size: 1.5rem;
   color: #e8e8e8;
-  text-shadow: 0 0 10px #ffffff91;
+  color: rgb(33, 33, 33);
+  text-shadow: 0 0 10px #eeeeee91;
   transform-style: preserve-3d;
   user-select: none;
 }
 
 .player-mark[data-state='success'] {
+  color: rgb(255, 255, 255);
   animation: glow 2s ease-in-out infinite alternate;
 }
 
 @keyframes glow {
   from {
-    text-shadow: 0 0 5px #fff;
+    text-shadow: 0 0 5px #ccedd2;
   }
 
   to {
     text-shadow:
-      0 0 5px #fff,
-      0 0 10px #fff;
+      0 0 5px #ccedd2,
+      0 0 10px #ccedd2;
   }
+}
+
+.btn {
+  --btn-surface: white;
+  --btn-background: rgb(20, 18, 18);
+  --btn-background-dark: #dd0000;
+
+  font-family: 'Sniglet';
+  font-size: 1.5rem;
+  color: var(--btn-surface);
+  background-color: var(--btn-background);
+  text-transform: uppercase;
+  text-decoration: none;
+  margin: 1rem;
+  padding: 1rem 2.5rem;
+  min-width: 100px;
+  border: 2px solid var(--btn-background);
+  border-radius: 2rem;
+  position: relative;
+  top: 0;
+  transition: all 100ms ease-in-out;
 }

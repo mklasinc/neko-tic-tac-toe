@@ -112,21 +112,25 @@ export default function App() {
 
       <div className="ui">
         <h1>Tic tac toe</h1>
-        {!isGameOver && <div>Player {player}'s turn</div>}
+        {!isGameOver && <div className="status">Player {player}'s turn</div>}
         {isGameOver && (
           <>
-            <div>Game is over</div>
-            {gameOutcome === Player.X && <div>Player X won</div>}
-            {gameOutcome === Player.O && <div>Player O won</div>}
-            {gameOutcome === 'draw' && <div>This was a draw!</div>}
-            <button
-              onClick={() => {
-                setTiles(getDefaultTiles())
-                setPlayer(Player.X)
-              }}
-            >
-              Reset
-            </button>
+            <div className="status">
+              {gameOutcome === Player.X && 'Player X won!'}
+              {gameOutcome === Player.O && 'Player O won!'}
+              {gameOutcome === 'draw' && 'This was a draw!'}
+            </div>
+            <div className="btn-container">
+              <button
+                className="btn"
+                onClick={() => {
+                  setTiles(getDefaultTiles())
+                  setPlayer(Player.X)
+                }}
+              >
+                Reset
+              </button>
+            </div>
           </>
         )}
       </div>
