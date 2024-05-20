@@ -13,3 +13,23 @@ canvas {
   height: 100%;
   width: 100%;
 }
+
+.ui {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  pointer-events: none;
+  user-select: none;
+}
+
+button:not(:disabled) {
+  pointer-events: auto;
+  cursor: pointer;
+}
