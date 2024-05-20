@@ -84,10 +84,11 @@ export default function App() {
           <group position-x={-(TILE_SIZE + GAP)} position-y={TILE_SIZE + GAP}>
             {tiles.map((_, index) => (
               <Tile
-                key={index}
+                key={`tile-${index}-${isGameOver}`}
                 position={getTilePosition(index)}
                 size={TILE_SIZE}
                 state={hasPlayerWonTheGame && isTilePartOfWinningLine(tiles, index) ? 'success' : 'idle'}
+                currentPlayer={player}
                 value={tiles[index]}
                 isAvailable={!isGameOver && tiles[index] === null}
                 onClick={() => {

@@ -134,6 +134,14 @@ button:not(:disabled) {
   cursor: pointer;
 }
 
+.webgl-ui-overlay {
+  pointer-events: none;
+}
+
+.webgl-ui-overlay * {
+  pointer-events: none !important;
+}
+
 .player-mark {
   font-family: 'Sniglet';
   font-weight: 900;
@@ -141,13 +149,18 @@ button:not(:disabled) {
   color: #e8e8e8;
   color: rgb(33, 33, 33);
   text-shadow: 0 0 10px #eeeeee91;
-  transform-style: preserve-3d;
   user-select: none;
+  pointer-events: none !important;
 }
 
 .player-mark[data-state='success'] {
   color: rgb(255, 255, 255);
   animation: glow 2s ease-in-out infinite alternate;
+}
+
+.player-mark[data-preview='true'] {
+  color: rgb(255, 255, 255);
+  opacity: 0.4;
 }
 
 @keyframes glow {
