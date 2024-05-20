@@ -49,6 +49,7 @@ export const Tile = ({
             onClick: (e: any) => {
               e.stopPropagation()
               if (typeof onClick === 'function') onClick(e)
+              setHovered(false)
 
               // shake
               animate(hoverOffset, 0, {
