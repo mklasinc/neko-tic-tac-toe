@@ -8,6 +8,7 @@ import { useStore } from './store'
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls, PerspectiveCamera } from '@react-three/drei'
 import React, { Suspense } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
 import type { Tiles, GameOutcome } from './types'
 
 const TILE_SIZE = 1
@@ -118,26 +119,33 @@ export default function App() {
 
       <div className="ui">
         <WavyText text="Tic tac toe" replay={!isLoading} delay={0.9} />
-        {!isGameOver && <div className="status">Player {player}'s turn</div>}
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div
+            key={`${isGameOver}-${player}`}
+            className="status"
+            initial={{ y: '30%', opacity: 0 }}
+            animate={{ opacity: 1, y: 0, transition: { duration: 0.3, ease: 'easeOut', delay: 0.05 } }}
+            exit={{ y: '-30%', opacity: 0, transition: { duration: 0.15, ease: 'easeOut' } }}
+          >
+            {!isGameOver && `Player ${player}'s turn`}
+            {isGameOver && gameOutcome === Player.X && 'Player X won!'}
+            {isGameOver && gameOutcome === Player.O && 'Player O won!'}
+            {isGameOver && gameOutcome === 'draw' && 'This was a draw!'}
+          </motion.div>
+        </AnimatePresence>
+
         {isGameOver && (
-          <>
-            <div className="status">
-              {gameOutcome === Player.X && 'Player X won!'}
-              {gameOutcome === Player.O && 'Player O won!'}
-              {gameOutcome === 'draw' && 'This was a draw!'}
-            </div>
-            <div className="btn-container">
-              <button
-                className="btn"
-                onClick={() => {
-                  setTiles(getDefaultTiles())
-                  setPlayer(Player.X)
-                }}
-              >
-                Reset
-              </button>
-            </div>
-          </>
+          <div className="btn-container">
+            <button
+              className="btn"
+              onClick={() => {
+                setTiles(getDefaultTiles())
+                setPlayer(Player.X)
+              }}
+            >
+              Reset
+            </button>
+          </div>
         )}
       </div>
     </>

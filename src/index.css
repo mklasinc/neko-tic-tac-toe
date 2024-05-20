@@ -119,6 +119,8 @@ body {
 }
 
 .ui .status {
+  width: 100%;
+
   font-size: 1.5rem;
   color: rgb(47, 47, 47);
 }
