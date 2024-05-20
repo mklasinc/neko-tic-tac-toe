@@ -1,8 +1,10 @@
 import { isNotNull } from './utils/type-guards'
 import { RoundedBox, Html, useCursor } from '@react-three/drei'
-import React, { useCallback } from 'react'
+import React, { useCallback, useEffect } from 'react'
+import { animate, motionValue, useMotionValue } from 'framer-motion'
 import type { GroupProps } from '@react-three/fiber'
 import type { Player } from './types'
+import type { Group } from 'three'
 
 interface TileProps extends GroupProps {
   size: number
@@ -27,7 +29,7 @@ export const Tile = ({
   onClick,
   ...props
 }: TileProps) => {
-  const ref = React.useRef(null)
+  const ref = React.useRef<Group | null>(null)
   const [hovered, setHovered] = React.useState(false)
 
   useCursor(hovered && isAvailable)
@@ -36,7 +38,6 @@ export const Tile = ({
     () =>
       isAvailable
         ? {
-            onClick,
             onPointerEnter: (e: any) => {
               e.stopPropagation()
               setHovered(true)
@@ -45,10 +46,38 @@ export const Tile = ({
               e.stopPropagation()
               setHovered(false)
             },
+            onClick: (e: any) => {
+              e.stopPropagation()
+              if (typeof onClick === 'function') onClick(e)
+
+              // shake
+              animate(hoverOffset, 0, {
+                type: 'spring',
+                stiffness: 500,
+                damping: 10,
+              })
+            },
           }
         : {},
-    [isAvailable, onClick],
+    [isAvailable, onClick]
   )
+
+  const hoverOffset = useMotionValue(0)
+
+  hoverOffset.on('change', (offset) => {
+    if (!ref.current) return
+    ref.current.position.z = offset
+  })
+
+  useEffect(() => {
+    if (!ref.current || !isAvailable) return
+
+    const controls = animate(hoverOffset, hovered && isAvailable ? size * 0.3 : 0, { duration: 0.15 })
+
+    return () => {
+      controls.stop()
+    }
+  }, [hovered, isAvailable])
 
   return (
     <group ref={ref} {...props}>

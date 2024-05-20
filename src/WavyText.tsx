@@ -8,7 +8,7 @@ interface Props extends HTMLMotionProps<'div'> {
   duration?: number
 }
 
-const WavyText: FC<Props> = ({ text, delay = 0, duration = 0.05, replay, ...props }: Props) => {
+const WavyText: FC<Props> = ({ text, delay = 0, duration = 0.02, replay, ...props }: Props) => {
   const letters = Array.from(text)
 
   const container: Variants = {
@@ -27,8 +27,8 @@ const WavyText: FC<Props> = ({ text, delay = 0, duration = 0.05, replay, ...prop
       y: 0,
       transition: {
         type: 'spring',
-        damping: 12,
-        stiffness: 200,
+        damping: 10,
+        stiffness: 300,
       },
     },
     hidden: {
@@ -36,8 +36,8 @@ const WavyText: FC<Props> = ({ text, delay = 0, duration = 0.05, replay, ...prop
       y: 20,
       transition: {
         type: 'spring',
-        damping: 12,
-        stiffness: 200,
+        damping: 10,
+        stiffness: 300,
       },
     },
   }
