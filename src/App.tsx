@@ -10,21 +10,13 @@ import {
   useTileWinningLineRevealEffect,
   useTitleRevealEffect,
 } from './App.animations'
-import { TILE_SIZE, TILE_GAP } from './constants'
+import { TILE_SIZE } from './constants'
+import { getTilePosition, getDefaultTiles, isTilePartOfWinningLine, GRID_CONTAINER_BASE_POSITION } from './utils/tiles'
 import { Canvas } from '@react-three/fiber'
 import { PerspectiveCamera } from '@react-three/drei'
 import React, { useRef } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import type { Group } from 'three'
-import type { Tiles } from './types'
-
-const getTilePosition = (index: number) => {
-  const x = (index % 3) * (TILE_SIZE + TILE_GAP)
-  const y = Math.floor(index / 3) * (TILE_SIZE + TILE_GAP) * -1
-  return [x, y, 0] as const
-}
-
-const getDefaultTiles = (): Tiles => Array.from({ length: 9 }).fill(null) as Tiles
 
 export default function App() {
   const isLoading = useStore((state) => state.isLoading)
@@ -54,19 +46,12 @@ export default function App() {
     return tiles.every(isNotNull) ? [] : null
   }, [tiles])
 
-  const isTilePartOfWinningLine = (index: number) => isNotNull(gameOutcome) && gameOutcome.includes(index)
-
   const isGameOver = isNotNull(gameOutcome)
   const winner = isGameOver ? tiles[gameOutcome[0]] ?? null : null
   const hasWinner = isNotNull(winner)
 
   const titleRef = useRef<HTMLHeadingElement>(null)
   const gridContainerRef = useRef<Group>(null)
-  const gridContainerBasePosition = useRef({
-    x: -(TILE_SIZE + TILE_GAP),
-    y: TILE_SIZE + TILE_GAP,
-    z: 0,
-  }).current
 
   useTitleRevealEffect({ target: titleRef, trigger: !isLoading, transition: { delay: 0.2 } })
   useTileRevealEffect({ target: gridContainerRef, trigger: !isLoading })
@@ -84,19 +69,22 @@ export default function App() {
         <directionalLight position={[-5, 5, 5]} />
         <ambientLight intensity={0.8} />
 
-        <group ref={gridContainerRef} position-x={gridContainerBasePosition.x} position-y={gridContainerBasePosition.y}>
+        <group
+          ref={gridContainerRef}
+          position-x={GRID_CONTAINER_BASE_POSITION.x}
+          position-y={GRID_CONTAINER_BASE_POSITION.y}
+        >
           {tiles.map((_, index) => (
             <group key={index} position={getTilePosition(index)}>
               <group name="animation-container">
                 <Tile
                   size={TILE_SIZE}
-                  state={isNotNull(winner) && isTilePartOfWinningLine(index) ? 'success' : 'idle'}
+                  state={isNotNull(winner) && isTilePartOfWinningLine(index, gameOutcome) ? 'success' : 'idle'}
                   currentPlayer={player}
                   value={tiles[index]}
                   isAvailable={!isGameOver && tiles[index] === null}
                   onClick={() => {
                     const canPlaceTile = tiles[index] === null
-
                     if (!canPlaceTile) return
 
                     setTiles(
@@ -105,7 +93,6 @@ export default function App() {
                         return tile
                       })
                     )
-
                     togglePlayer()
                   }}
                 />
