@@ -1,5 +1,5 @@
-import { useStore } from './store'
-import { LOADER_SEQUENCE_DURATION } from './constants'
+import { useStore } from '../store'
+import { LOADER_SEQUENCE_DURATION } from '../constants'
 import React, { useEffect, useRef } from 'react'
 
 export const Loader = () => {
@@ -29,7 +29,7 @@ export const Loader = () => {
 
     intervalId.current = setInterval(() => {
       setLoaderText((prev) => (prev === 'X' ? 'O' : 'X'))
-    }, 150)
+    }, 200)
 
     return () => {
       if (intervalId.current) clearInterval(intervalId.current)

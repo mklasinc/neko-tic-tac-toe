@@ -1,7 +1,8 @@
-import { Tile } from './Tile'
+import { Tile } from './components/Tile'
 import { areValuesEqual } from './utils/eq'
+import { getTilePosition, getDefaultTiles, isTilePartOfWinningLine, GRID_CONTAINER_BASE_POSITION } from './utils/tiles'
 import { isNotNull, isNull } from './utils/type-guards'
-import { Loader } from './Loader'
+import { Loader } from './components/Loader'
 import { Player } from './types'
 import { useStore } from './store'
 import {
@@ -11,11 +12,11 @@ import {
   useTitleRevealEffect,
 } from './App.animations'
 import { TILE_SIZE } from './constants'
-import { getTilePosition, getDefaultTiles, isTilePartOfWinningLine, GRID_CONTAINER_BASE_POSITION } from './utils/tiles'
+import { AnimatePresence, motion } from 'framer-motion'
 import { Canvas } from '@react-three/fiber'
 import { PerspectiveCamera } from '@react-three/drei'
 import React, { useRef } from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
+
 import type { Group } from 'three'
 
 export default function App() {

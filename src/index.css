@@ -1,38 +1,3 @@
-:root {
-  --ease: ease-in-out;
-  --ease-in-quad: cubic-bezier(0.55, 0.085, 0.68, 0.53);
-  --ease-in-cubic: cubic-bezier(0.55, 0.055, 0.675, 0.19);
-  --ease-in-quart: cubic-bezier(0.895, 0.03, 0.685, 0.22);
-  --ease-in-quint: cubic-bezier(0.755, 0.05, 0.855, 0.06);
-  --ease-in-expo: cubic-bezier(0.95, 0.05, 0.795, 0.035);
-  --ease-in-circ: cubic-bezier(0.6, 0.04, 0.98, 0.335);
-  --ease-in-back: cubic-bezier(0.6, -0.28, 0.735, 0.045);
-  --ease-out-quad: cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  --ease-out-cubic: cubic-bezier(0.215, 0.61, 0.355, 1);
-  --ease-out-quart: cubic-bezier(0.165, 0.84, 0.44, 1);
-  --ease-out-quint: cubic-bezier(0.23, 1, 0.32, 1);
-  --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
-  --ease-out-circ: cubic-bezier(0.075, 0.82, 0.165, 1);
-  --ease-out-back: cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  --ease-in-out-quad: cubic-bezier(0.455, 0.03, 0.515, 0.955);
-  --ease-in-out-cubic: cubic-bezier(0.645, 0.045, 0.355, 1);
-  --ease-in-out-quart: cubic-bezier(0.77, 0, 0.175, 1);
-  --ease-in-out-quint: cubic-bezier(0.86, 0, 0.07, 1);
-  --ease-in-out-expo: cubic-bezier(1, 0, 0, 1);
-  --ease-in-out-circ: cubic-bezier(0.785, 0.135, 0.15, 0.86);
-  --ease-in-out-back: cubic-bezier(0.68, -0.55, 0.265, 1.55);
-
-  --color-primary: orange;
-  --color-secondary: #381f05;
-  --color-primary-accent: #513e1b;
-
-  --ui-padding: 2rem;
-
-  @media (min-width: 768px) {
-    --ui-padding: 5rem;
-  }
-}
-
 @font-face {
   font-family: 'Sniglet';
   src: url('./fonts/Sniglet-webfont.woff') format('woff');
@@ -45,6 +10,18 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+}
+
+:root {
+  --color-primary: orange;
+  --color-secondary: #381f05;
+  --color-primary-accent: #513e1b;
+
+  --ui-padding: 2rem;
+
+  @media (min-width: 768px) {
+    --ui-padding: 5rem;
+  }
 }
 
 html,
@@ -101,22 +78,22 @@ body[data-is-ready='true'] .loader {
   color: var(--color-primary-accent);
 }
 
+.ui > * + * {
+  margin-top: 1rem;
+}
+
 .ui h1 {
   font-family: 'Sniglet';
   font-weight: 900;
   font-size: 3rem;
-  margin: 1rem;
   letter-spacing: -0.025em;
   text-transform: uppercase;
   color: var(--color-primary);
+  margin: 1rem;
 
   @media (min-width: 768px) {
     font-size: 5rem;
   }
-}
-
-.ui > * + * {
-  margin-top: 1rem;
 }
 
 .game-status-text {
@@ -148,44 +125,6 @@ button:not(:disabled) {
   cursor: pointer;
 }
 
-.webgl-ui-overlay {
-  pointer-events: none;
-}
-
-.webgl-ui-overlay * {
-  pointer-events: none !important;
-}
-
-.player-mark {
-  font-family: 'Sniglet';
-  font-weight: 900;
-  font-size: 1.5rem;
-  color: var(--color-secondary);
-  text-shadow: 0 0 10px #00000039;
-  user-select: none;
-  pointer-events: none !important;
-}
-
-.player-mark[data-state='success'] {
-  color: white;
-  animation: glow 2s ease-in-out infinite alternate;
-}
-
-.player-mark[data-preview='true'] {
-  color: white;
-  opacity: 0.4;
-}
-
-@keyframes glow {
-  from {
-    text-shadow: 0 0 5px #ccedd2;
-  }
-
-  to {
-    text-shadow: 0 0 5px #ccedd2, 0 0 10px #ccedd2;
-  }
-}
-
 .btn {
   font-family: 'Sniglet';
   font-size: 1.5rem;
@@ -203,6 +142,46 @@ button:not(:disabled) {
   border: none;
 }
 
+/*
+* Necessary so that X's and O's tied to the WebGL Cube's don't pick up pointer events
+*/
+.webgl-ui-overlay * {
+  pointer-events: none !important;
+}
+
+.player-mark {
+  font-family: 'Sniglet';
+  font-weight: 900;
+  font-size: 1.5rem;
+  color: var(--color-secondary);
+  text-shadow: 0 0 10px #00000039;
+  user-select: none;
+}
+
+.player-mark[data-preview='true'] {
+  color: white;
+  opacity: 0.4;
+}
+
+.player-mark[data-state='success'] {
+  color: white;
+  animation: glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+  from {
+    text-shadow: 0 0 5px #ccedd2;
+  }
+
+  to {
+    text-shadow: 0 0 5px #ccedd2, 0 0 10px #ccedd2;
+  }
+}
+
+/*
+  * Splitting.js styles
+  * Necessary for animating individual characters
+*/
 .splitting .char {
   display: inline-block;
 }

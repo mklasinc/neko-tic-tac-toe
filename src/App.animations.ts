@@ -1,7 +1,7 @@
 import { isNull } from './utils/type-guards'
+import React, { type MutableRefObject } from 'react'
 import { animate, stagger, type Transition, motionValue } from 'framer-motion'
 import Splitting from 'splitting'
-import { MutableRefObject, useEffect, useRef, useState, useCallback } from 'react'
 import { mapLinear } from 'three/src/math/MathUtils'
 import type { Group } from 'three'
 
@@ -12,10 +12,10 @@ interface AnimationEffectProps<T> {
 }
 
 export const useTitleRevealEffect = ({ target, trigger, transition = {} }: AnimationEffectProps<HTMLElement>) => {
-  const hasSplitText = useRef(false)
+  const hasSplitText = React.useRef(false)
   const delay = transition?.delay ?? 0
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (!trigger || !target.current) return
 
     if (!hasSplitText.current) {
@@ -43,7 +43,7 @@ export const useTitleRevealEffect = ({ target, trigger, transition = {} }: Anima
 }
 
 export const useTileRevealEffect = ({ target, trigger }: AnimationEffectProps<Group>) => {
-  useEffect(() => {
+  React.useEffect(() => {
     if (!trigger || !target.current) return
 
     const tiles = target.current.children.map((child) => child.getObjectByName('animation-container') as Group)
@@ -77,7 +77,7 @@ export const useTileWinningLineRevealEffect = ({
 }: AnimationEffectProps<Group> & {
   gameOutcome: number[] | null
 }) => {
-  useEffect(() => {
+  React.useEffect(() => {
     if (isNull(target.current) || isNull(gameOutcome)) return
 
     const tiles = target.current.children.map((child) => child.getObjectByName('animation-container') as Group)
@@ -98,7 +98,7 @@ export const useTileWinningLineRevealEffect = ({
 }
 
 export const useTileContainerWinnerRevealEffect = ({ target, trigger }: AnimationEffectProps<Group>) => {
-  useEffect(() => {
+  React.useEffect(() => {
     if (!target.current) return
 
     const startRotationX = target.current.rotation.x
