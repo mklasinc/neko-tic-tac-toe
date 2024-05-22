@@ -22,11 +22,15 @@
   --ease-in-out-circ: cubic-bezier(0.785, 0.135, 0.15, 0.86);
   --ease-in-out-back: cubic-bezier(0.68, -0.55, 0.265, 1.55);
 
-  --ui-padding: 5rem;
-
   --color-primary: orange;
   --color-secondary: #381f05;
   --color-primary-accent: #513e1b;
+
+  --ui-padding: 2rem;
+
+  @media (min-width: 768px) {
+    --ui-padding: 5rem;
+  }
 }
 
 @font-face {
@@ -60,6 +64,7 @@ body {
 .loader {
   font-family: 'Sniglet';
   position: fixed;
+  z-index: 100;
   width: 100%;
   height: 100%;
   top: 0;
@@ -68,9 +73,8 @@ body {
   justify-content: center;
   align-items: center;
   background-color: #f2e7d4;
-  z-index: 100;
-  font-size: 5rem;
   color: var(--color-primary);
+  font-size: 5rem;
 }
 
 body[data-is-ready='true'] .loader {
@@ -100,11 +104,15 @@ body[data-is-ready='true'] .loader {
 .ui h1 {
   font-family: 'Sniglet';
   font-weight: 900;
-  font-size: 5rem;
+  font-size: 3rem;
   margin: 1rem;
   letter-spacing: -0.025em;
   text-transform: uppercase;
   color: var(--color-primary);
+
+  @media (min-width: 768px) {
+    font-size: 5rem;
+  }
 }
 
 .ui > * + * {
@@ -128,7 +136,7 @@ body[data-is-ready='true'] .game-status-text {
   transition-delay: 0.8s;
 }
 
-.ui .btn-container {
+.footer {
   position: fixed;
   bottom: var(--ui-padding);
   left: 50%;
@@ -193,4 +201,8 @@ button:not(:disabled) {
   top: 0;
   transition: all 100ms ease-in-out;
   border: none;
+}
+
+.splitting .char {
+  display: inline-block;
 }

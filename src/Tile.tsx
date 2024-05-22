@@ -45,7 +45,6 @@ export const Tile = React.forwardRef<Group, TileProps>(
                 if (typeof onClick === 'function') onClick(e)
                 setHovered(false)
 
-                // shake
                 animate(hoverOffset, 0, {
                   type: 'spring',
                   stiffness: 500,

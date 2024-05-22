@@ -15,7 +15,7 @@ interface StoreState {
 }
 
 export const useStore = create<StoreState>()((set) => ({
-  isLoading: false,
+  isLoading: true,
   setIsLoading: (isLoading) => set({ isLoading }),
 
   tiles: Array.from({ length: 9 }).fill(null) as Tiles,

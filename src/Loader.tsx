@@ -1,11 +1,27 @@
 import { useStore } from './store'
+import { LOADER_SEQUENCE_DURATION } from './constants'
 import React, { useEffect, useRef } from 'react'
 
 export const Loader = () => {
   const [showLoaderAnimation, setShowLoaderAnimation] = React.useState(true)
   const [loaderText, setLoaderText] = React.useState('X')
-  const isLoading = useStore((state) => state.isLoading)
+  const setIsLoading = useStore((state) => state.setIsLoading)
   const intervalId = useRef<number | null>(null)
+
+  // Show loader sequence for a set duration
+  // then set global loading state to false, but keep loader visible for a bit longer for animation purpose
+  useEffect(() => {
+    let timeoutId: number | null = null
+
+    timeoutId = setTimeout(() => {
+      setIsLoading(false)
+      timeoutId = setTimeout(() => setShowLoaderAnimation(false), 150)
+    }, LOADER_SEQUENCE_DURATION)
+
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId)
+    }
+  }, [])
 
   //  X|O loader animation
   useEffect(() => {
@@ -20,30 +36,10 @@ export const Loader = () => {
     }
   }, [showLoaderAnimation])
 
-  // set loader state on the body
+  // Set global loading state to true when loader is visible
   useEffect(() => {
     document.body.dataset.isReady = (!showLoaderAnimation).toString()
   }, [showLoaderAnimation])
 
-  // stop loader animation when loading sequence is done
-  useEffect(() => {
-    if (!isLoading) {
-      setTimeout(() => setShowLoaderAnimation(false), 1000)
-    }
-  }, [isLoading])
-
   return <div className="loader">{loaderText}</div>
 }
-
-const Trigger = () => {
-  const setIsLoading = useStore((state) => state.setIsLoading)
-
-  useEffect(() => {
-    return () => {
-      setIsLoading(false)
-    }
-  }, [])
-  return null
-}
-
-Loader.Trigger = Trigger

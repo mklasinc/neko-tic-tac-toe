@@ -24,6 +24,7 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-merge-refs": "^2.0.1",
+    "splitting": "^1.0.6",
     "three": "^0.164.1",
     "zustand": "^4.5.2"
   },
