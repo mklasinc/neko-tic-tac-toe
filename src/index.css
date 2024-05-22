@@ -1,5 +1,5 @@
 @font-face {
-  font-family: 'Sniglet';
+  font-family: 'Sniglet', sans-serif;
   src: url('./fonts/Sniglet-webfont.woff') format('woff');
   font-display: swap;
 }
@@ -39,7 +39,8 @@ body {
 }
 
 .loader {
-  font-family: 'Sniglet';
+  font-family: 'Sniglet', sans-serif;
+  font-weight: 900;
   position: fixed;
   z-index: 100;
   width: 100%;
@@ -83,7 +84,7 @@ body[data-is-ready='true'] .loader {
 }
 
 .ui h1 {
-  font-family: 'Sniglet';
+  font-family: 'Sniglet', sans-serif;
   font-weight: 900;
   font-size: 3rem;
   letter-spacing: -0.025em;
@@ -126,7 +127,7 @@ button:not(:disabled) {
 }
 
 .btn {
-  font-family: 'Sniglet';
+  font-family: 'Sniglet', sans-serif;
   font-size: 1.5rem;
   color: var(--color-secondary);
   background-color: var(--color-primary);
@@ -150,7 +151,7 @@ button:not(:disabled) {
 }
 
 .player-mark {
-  font-family: 'Sniglet';
+  font-family: 'Sniglet', sans-serif;
   font-weight: 900;
   font-size: 1.5rem;
   color: var(--color-secondary);
