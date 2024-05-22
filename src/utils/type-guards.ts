@@ -52,4 +52,4 @@ export const isEmpty = (value: any): boolean => {
 
   return false
 }
-export const isNotEmpty = (value: any): boolean => !isEmpty(value)
+export const isNotEmpty = <T>(value: T): value is T => !isEmpty(value)

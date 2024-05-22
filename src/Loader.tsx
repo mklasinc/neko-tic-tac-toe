@@ -1,39 +1,15 @@
 import { useStore } from './store'
 import React, { useEffect, useRef } from 'react'
 
-// interface LoaderPops {
-//   show: boolean
-//   setShow: (show: boolean) => void
-// }
-
-// const LoaderContext = React.createContext<LoaderPops>({
-//   show: false,
-//   setShow: () => {
-//     /* noop */
-//   },
-// })
-
-// export const Provider = (props: React.PropsWithChildren<{}>) => {
-//   const [show, setShow] = React.useState(false)
-
-//   return <LoaderContext.Provider value={{ show, setShow }}>{props.children}</LoaderContext.Provider>
-// }
-
 export const Loader = () => {
-  const [playAnimation, setPlayAnimation] = React.useState(true)
+  const [showLoaderAnimation, setShowLoaderAnimation] = React.useState(true)
   const [loaderText, setLoaderText] = React.useState('X')
   const isLoading = useStore((state) => state.isLoading)
-
   const intervalId = useRef<number | null>(null)
 
+  //  X|O loader animation
   useEffect(() => {
-    if (!isLoading) {
-      setTimeout(() => setPlayAnimation(false), 1000)
-    }
-  }, [isLoading])
-
-  useEffect(() => {
-    if (!playAnimation) return
+    if (!showLoaderAnimation) return
 
     intervalId.current = setInterval(() => {
       setLoaderText((prev) => (prev === 'X' ? 'O' : 'X'))
@@ -42,13 +18,21 @@ export const Loader = () => {
     return () => {
       if (intervalId.current) clearInterval(intervalId.current)
     }
-  }, [playAnimation])
+  }, [showLoaderAnimation])
 
-  return (
-    <div className="loader" data-show={playAnimation}>
-      {loaderText}
-    </div>
-  )
+  // set loader state on the body
+  useEffect(() => {
+    document.body.dataset.isReady = (!showLoaderAnimation).toString()
+  }, [showLoaderAnimation])
+
+  // stop loader animation when loading sequence is done
+  useEffect(() => {
+    if (!isLoading) {
+      setTimeout(() => setShowLoaderAnimation(false), 1000)
+    }
+  }, [isLoading])
+
+  return <div className="loader">{loaderText}</div>
 }
 
 const Trigger = () => {

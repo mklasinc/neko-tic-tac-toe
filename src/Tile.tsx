@@ -1,8 +1,7 @@
-import { isNotNull } from './utils/type-guards'
 import { useMergeRefs } from './hooks/use-merge-refs'
 import { RoundedBox, Html, useCursor } from '@react-three/drei'
-import React, { MutableRefObject, useCallback, useEffect } from 'react'
-import { animate, motionValue, useMotionValue } from 'framer-motion'
+import React, { useEffect } from 'react'
+import { animate, useMotionValue } from 'framer-motion'
 import type { GroupProps } from '@react-three/fiber'
 import type { Player } from './types'
 import type { Group } from 'three'
@@ -16,7 +15,7 @@ interface TileProps extends GroupProps {
 }
 
 const colors: Record<TileProps['state'], string> = {
-  idle: '#def0ff',
+  idle: '#fff8e2',
   success: '#3bff98',
   error: '#ff3b3b',
 }

@@ -1,6 +1,6 @@
 import { Tile } from './Tile'
 import { areValuesEqual } from './utils/eq'
-import { isArray, isNotEmpty, isNotNull } from './utils/type-guards'
+import { isArray, isNotNull } from './utils/type-guards'
 import { Loader } from './Loader'
 import WavyText from './WavyText'
 import { Player } from './types'
@@ -10,6 +10,7 @@ import { OrbitControls, PerspectiveCamera } from '@react-three/drei'
 import React, { Suspense, useEffect, useRef } from 'react'
 import { AnimatePresence, animate, motion, motionValue, useMotionValue } from 'framer-motion'
 import { Group } from 'three'
+import { mapLinear } from 'three/src/math/MathUtils'
 import type { Tiles } from './types'
 
 const TILE_SIZE = 1
@@ -79,36 +80,81 @@ export default function App() {
     })
   }, [isGameOver, gameOutcome])
 
-  const groupRotation = useMotionValue(0)
+  const gridContainerBasePosition = useRef({
+    x: -(TILE_SIZE + GAP),
+    y: TILE_SIZE + GAP,
+    z: 0,
+  }).current
+
   useEffect(() => {
-    animate(groupRotation, isNotNull(gameOutcome) ? Math.PI * 0.1 : 0, {
-      duration: 0.4,
+    if (!gridContainerRef.current || (isArray(gameOutcome) && gameOutcome.length === 0)) return
+
+    const startRotationX = gridContainerRef.current.rotation.x
+    const startRotationY = gridContainerRef.current.rotation.y
+
+    const targetRotationX = isNotNull(gameOutcome) ? Math.PI * 0.1 : 0
+    const targetRotationY = targetRotationX * -1
+
+    const controls = animate(0, 1, {
       type: 'spring',
       damping: 10,
-      stiffness: 100,
-      delay: 0.1,
+      stiffness: 150,
+      delay: 0.15,
       onUpdate: (value) => {
         if (!gridContainerRef.current) return
-        gridContainerRef.current.rotation.y = -value
-        gridContainerRef.current.rotation.x = value * 0.5
+        gridContainerRef.current.rotation.y = mapLinear(value, 0, 1, startRotationY, targetRotationY)
+        gridContainerRef.current.rotation.x = mapLinear(value, 0, 1, startRotationX, targetRotationX)
       },
     })
+
+    return () => controls.pause()
   }, [gameOutcome])
+
+  useEffect(() => {
+    if (isLoading) return
+
+    const controls = Array.from({ length: 9 })
+      .fill(null)
+      .map((mv, index) =>
+        animate(0, 1, {
+          delay: 0.85 + index * 0.035, // stagger delay
+          type: 'spring',
+          damping: 8,
+          stiffness: 200,
+          onUpdate: (progress) => {
+            const scale = mapLinear(progress, 0, 1, 0.85, 1)
+            const rotationY = mapLinear(progress, 0, 1, Math.PI * 0.25, 0)
+            if (tileRefs.current[index]) {
+              tileRefs.current[index].scale.setScalar(scale)
+              tileRefs.current[index].position.y = mapLinear(progress, 0, 1, -0.3, 0)
+              tileRefs.current[index].rotation.y = rotationY
+            }
+          },
+        })
+      )
+
+    // Stop animations on unmount
+    return () => controls.forEach((control) => control.pause())
+  }, [isLoading])
 
   return (
     <>
-      {/* <Loader /> */}
+      <Loader />
       <Canvas>
         <Suspense fallback={<Loader.Trigger />}>
           <OrbitControls />
-          <color attach="background" args={['#eeeeee']} />
+          <color attach="background" args={['#f2e7d4']} />
           {/* <axesHelper /> */}
           <PerspectiveCamera makeDefault position={[0, 0, 10]} />
-          <directionalLight position={[0, 0, 5]} intensity={0.5} />
-          <directionalLight position={[0, 0, -5]} intensity={0.5} />
-          <ambientLight intensity={0.5} />
+          <directionalLight position={[5, 5, 5]} color={'#ffa300'} />
+          <directionalLight position={[-5, 5, 5]} />
+          <ambientLight intensity={0.8} />
 
-          <group ref={gridContainerRef} position-x={-(TILE_SIZE + GAP)} position-y={TILE_SIZE + GAP}>
+          <group
+            ref={gridContainerRef}
+            position-x={gridContainerBasePosition.x}
+            position-y={gridContainerBasePosition.y}
+          >
             {tiles.map((_, index) => (
               <group key={index} position={getTilePosition(index)}>
                 <group
@@ -146,20 +192,21 @@ export default function App() {
       </Canvas>
 
       <div className="ui">
-        <WavyText text="Tic tac toe" replay={!isLoading} delay={0.9} />
+        <WavyText text="Tic tac toe" replay={!isLoading} delay={1.1} />
         <AnimatePresence mode="wait" initial={false}>
-          <motion.div
-            key={`${isGameOver}-${player}`}
-            className="status"
-            initial={{ y: '30%', opacity: 0 }}
-            animate={{ opacity: 1, y: 0, transition: { duration: 0.3, ease: 'easeOut', delay: 0.05 } }}
-            exit={{ y: '-30%', opacity: 0, transition: { duration: 0.15, ease: 'easeOut' } }}
-          >
-            {!isGameOver && `Player ${player}'s turn`}
-            {isGameOver && winner === Player.X && 'Player X won!'}
-            {isGameOver && winner === Player.O && 'Player O won!'}
-            {isGameOver && winner === null && 'This was a draw!'}
-          </motion.div>
+          <div className="game-status-text">
+            <motion.div
+              key={`${isGameOver}-${player}`}
+              initial={{ y: '30%', opacity: 0 }}
+              animate={{ opacity: 1, y: 0, transition: { duration: 0.3, ease: 'easeOut', delay: 0.05 } }}
+              exit={{ y: '-30%', opacity: 0, transition: { duration: 0.15, ease: 'easeOut' } }}
+            >
+              {!isGameOver && `Player ${player}'s turn`}
+              {isGameOver && winner === Player.X && 'Player X won!'}
+              {isGameOver && winner === Player.O && 'Player O won!'}
+              {isGameOver && winner === null && 'This was a draw!'}
+            </motion.div>
+          </div>
         </AnimatePresence>
 
         {isGameOver && (
