@@ -87,8 +87,21 @@ export const Tile = ({
         {...pointerEvents}
       >
         <meshStandardMaterial attach="material" toneMapped={false} color={colors[state]} />
-        <Html wrapperClass="webgl-ui-overlay" center transform position-z={size * 0.51} zIndexRange={[1, 99]}>
-          <div className="player-mark" data-state={state} data-preview={hovered && isAvailable}>
+        <Html
+          wrapperClass="webgl-ui-overlay"
+          center
+          transform
+          position-z={size * 0.51}
+          zIndexRange={[1, 99]}
+          scale={0.2}
+        >
+          <div
+            className="player-mark"
+            data-state={state}
+            data-preview={hovered && isAvailable}
+            // use scale to fix blurriness on Safari
+            style={{ transform: 'scale(5)' }}
+          >
             <div>{value ?? (hovered && isAvailable ? currentPlayer : '')}</div>
           </div>
         </Html>
